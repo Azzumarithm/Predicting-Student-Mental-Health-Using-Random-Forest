@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mental Health Prediction</title>
+  </head>
+  <body>
+    <h2>Mental Health Check</h2>
+    <form id="predict-form">
+      <label>Gender:</label>
+      <select name="Choose your gender" required>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option></select
+      ><br />
+
+      <label>Age:</label>
+      <input type="number" name="Age" required /><br />
+
+      <label>Course:</label>
+      <select name="What is your course?" required>
+        <option value="STEM">STEM</option>
+        <option value="Islamic Studies">Islamic Studies</option>
+        <option value="Law">Law</option>
+        <option value="Social Sciences, Economics &amp; Management">
+          Social Sciences, Economics &amp; Management
+        </option>
+        <option value="Arts &amp; Humanities">Arts &amp; Humanities</option>
+        <option value="Health &amp; Life Sciences">
+          Health &amp; Life Sciences
+        </option></select
+      ><br />
+
+      <label>Year of Study:</label>
+      <select name="Your current year of Study" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option></select
+      ><br />
+
+      <label>CGPA:</label>
+      <input type="text" name="What is your CGPA?" required /><br />
+
+      <label>Marital Status:</label>
+      <select name="Marital status" required>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option></select
+      ><br />
+
+      <label>Did you seek any specialist?</label>
+      <select name="Did you seek any specialist for a treatment?" required>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option></select
+      ><br />
+
+      <button type="submit">Predict</button>
+    </form>
+
+    <h3 id="result"></h3>
+
+    <script>
+      const form = document.querySelector("form");
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const jsonData = {};
+        formData.forEach((val, key) => {
+          jsonData[key] = val;
+        });
+
+        // Exclude unnecessary fields
+        const fieldsToExclude = [
+          "Do you have Depression?",
+          "Do you have Anxiety?",
+          "Do you have Panic attack?",
+        ];
+        fieldsToExclude.forEach((field) => {
+          delete jsonData[field];
+        });
+
+        const res = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(jsonData),
+        });
+
+        const result = await res.json();
+        if (result.error) {
+          document.getElementById("result").innerText =
+            "Error: " + result.error;
+        } else {
+          document.getElementById(
+            "result"
+          ).innerText = `🧠 Prediction: ${result.label}\n📊 Confidence: ${result.probability}%`;
+        }
+      });
+    </script>
+  </body>
+</html>
